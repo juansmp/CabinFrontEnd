@@ -1,9 +1,10 @@
-//URL para acceder a la BD
+/* URL PARA CONECTAR A LA BD*/
 const urlBase = "https://g651f78cf1701ef-bdalquilercabanas.adb.ca-toronto-1.oraclecloudapps.com/ords/admin/";
 $('#CabanasTable').on('click', 'tbody tr', function (event) {
     $(this).addClass('highlight').siblings().removeClass('highlight');
 });
-//METODOS CABANAS
+/************************** METODOS CABANAS ***************************/
+//TRAER INFORMACION CABANAS
 function TablaCabanas() {
     $.ajax({
         url: urlBase + "cabin/cabin",
@@ -25,6 +26,7 @@ function TablaCabanas() {
         }
     });
 }
+//TRAER INFORMACION DE UNA CABANA POR SU ID
 function GetCabanaById(IdCabana) {
     return $.ajax({
         url: urlBase + "cabin/cabin/" + IdCabana,
@@ -32,6 +34,31 @@ function GetCabanaById(IdCabana) {
         dataType: "json"
     });
 }
+//TRAER EL ULTIMO REGISTO DE LA TABLA CABANAS
+function GetCabanaEndId() {
+    return $.ajax({
+        url: urlBase + "cabin/count/1",
+        method: "GET",
+        dataType: "json"
+    });
+}
+//INSERTAR INFORMACION A LA TABLA CABANAS
+function PostCabana(IdCabana, Nombre, Habitaciones, Id_Categoria, Comentarios) {
+    let cabin = {
+        id: IdCabana,
+        brand: Nombre,
+        rooms: Habitaciones,
+        category_id: Id_Categoria,
+        name: Comentarios
+    }
+    return $.ajax({
+        url: urlBase + "cabin/cabin",
+        method: "POST",
+        contentType: 'application/json',
+        data: JSON.stringify(cabin)
+    });
+}
+//ACTUALIZAR INFORMACION DE UNA CABANA POR SU ID
 function PutCabanaById(IdCabana, Nombre, Habitaciones, Id_Categoria, Comentarios) {
     let cabin = {
         id: IdCabana,
@@ -47,6 +74,7 @@ function PutCabanaById(IdCabana, Nombre, Habitaciones, Id_Categoria, Comentarios
         data: JSON.stringify(cabin)
     });
 }
+//ELIMINAR INFORMACION DE UNA CABANA POR SU ID
 function DeleteCabanaById(IdCabana) {
     let cabin = {
         id: IdCabana
@@ -58,10 +86,11 @@ function DeleteCabanaById(IdCabana) {
         data: JSON.stringify(cabin)
     });
 }
-//METODOS CATEGORIA
+/************************** METODOS CATEGORIA ***************************/
 $('#CategoriaTable').on('click', 'tbody tr', function (event) {
     $(this).addClass('highlight').siblings().removeClass('highlight');
 });
+//TRAER INFORMACION CATEGORIA
 function TablaCategoria() {
     $.ajax({
         url: urlBase + "category/category",
@@ -81,6 +110,7 @@ function TablaCategoria() {
         }
     });
 }
+//TRAER INFORMACION DE UNA CATEGORIA POR SU ID
 function GetCategoriaById(IdCategoria) {
     return $.ajax({
         url: urlBase + "category/category/" + IdCategoria,
@@ -88,6 +118,7 @@ function GetCategoriaById(IdCategoria) {
         dataType: "json"
     });
 }
+//TRAER EL ULTIMO REGISTRO DE LA TABLA CATEGORIA
 function GetCategoriaEndId() {
     return $.ajax({
         url: urlBase + "category/count/1",
@@ -95,6 +126,7 @@ function GetCategoriaEndId() {
         dataType: "json"
     });
 }
+//INSERTAR INFORMACION A LA TABLA CATEGORIA
 function PostCategoria(IdCategoria, Nombre, Descripcion) {
     let category = {
         id: IdCategoria,
@@ -108,6 +140,7 @@ function PostCategoria(IdCategoria, Nombre, Descripcion) {
         data: JSON.stringify(category)
     });
 }
+//ACTUALIZAR INFORMACION DE UNA CATEGORIA POR SU ID
 function PutCategoriaById(IdCategoria, Nombre, Descripcion) {
     let category = {
         id: IdCategoria,
@@ -121,6 +154,7 @@ function PutCategoriaById(IdCategoria, Nombre, Descripcion) {
         data: JSON.stringify(category)
     });
 }
+//ELIMINAR INFORMACION DE UNA CATEGORIA POR SU ID
 function DeleteCategoriaById(IdCategoria) {
     let category = {
         id: IdCategoria
@@ -132,10 +166,11 @@ function DeleteCategoriaById(IdCategoria) {
         data: JSON.stringify(category)
     });
 }
-//METODOS CLIENTES
+/************************** METODOS CLIENTES ***************************/
 $('#ClientesTable').on('click', 'tbody tr', function (event) {
     $(this).addClass('highlight').siblings().removeClass('highlight');
 });
+//TRAER INFORMACION CLIENTES
 function TablaClientes() {
     $.ajax({
         url: urlBase + "client/client",
@@ -156,6 +191,7 @@ function TablaClientes() {
         }
     });
 }
+//TRAER INFORMACION DE UN CLIENTE POR SU ID
 function GetClienteById(IdCliente) {
     return $.ajax({
         url: urlBase + "client/client/" + IdCliente,
@@ -163,6 +199,7 @@ function GetClienteById(IdCliente) {
         dataType: "json"
     });
 }
+//TRAER EL ULTIMO REGISTRO DE LA TABLA CLIENTE
 function GetClienteEndId() {
     return $.ajax({
         url: urlBase + "client/count/1",
@@ -170,6 +207,7 @@ function GetClienteEndId() {
         dataType: "json"
     });
 }
+//INSERTAR INFORMACION A LA TABLA CLIENTE
 function PostCliente(IdCliente, Nombre, Email, Edad) {
     let client = {
         id: IdCliente,
@@ -184,6 +222,7 @@ function PostCliente(IdCliente, Nombre, Email, Edad) {
         data: JSON.stringify(client)
     });
 }
+//ACTUALIZAR INFORMACION DE UN CLIENTE POR SU ID
 function PutClienteById(IdCliente, Nombre, Email, Edad) {
     let client = {
         id: IdCliente,
@@ -198,6 +237,7 @@ function PutClienteById(IdCliente, Nombre, Email, Edad) {
         data: JSON.stringify(client)
     });
 }
+//ELIMINAR INFORMACION DE UN CLIENTE POR SU ID
 function DeleteClienteById(IdCliente) {
     let client = {
         id: IdCliente
@@ -209,10 +249,11 @@ function DeleteClienteById(IdCliente) {
         data: JSON.stringify(client)
     });
 }
-//METODOS MENSAJES
+/************************** METODOS MENSAJES ***************************/
 $('#MensajesTable').on('click', 'tbody tr', function (event) {
     $(this).addClass('highlight').siblings().removeClass('highlight');
 });
+//TRAER INFORMACION MENSAJES
 function TablaMensajes() {
     $.ajax({
         url: urlBase + "message/message",
@@ -231,6 +272,7 @@ function TablaMensajes() {
         }
     });
 }
+//TRAER INFORMACION DE UN MENSAJE POR SU ID
 function GetMensajeById(IdMensaje) {
     return $.ajax({
         url: urlBase + "message/message/" + IdMensaje,
@@ -238,6 +280,7 @@ function GetMensajeById(IdMensaje) {
         dataType: "json"
     });
 }
+//TRAER EL ULTIMO REGISTRO DE LA TABLA MENSAJES
 function GetMensajeEndId() {
     return $.ajax({
         url: urlBase + "message/count/1",
@@ -245,6 +288,7 @@ function GetMensajeEndId() {
         dataType: "json"
     });
 }
+//INSERTAR INFORMACION A LA TABLA MENSAJES
 function PostMensaje(IdMen, MensaText) {
     let messagge = {
         id: IdMen,
@@ -257,6 +301,7 @@ function PostMensaje(IdMen, MensaText) {
         data: JSON.stringify(messagge)
     });
 }
+//ACTUALIZAR INFORMACION DE UN MENSAJE POR SU ID
 function PutMensajeById(IdMensaje, TextMensaje) {
     let messagge = {
         id: IdMensaje,
@@ -269,6 +314,7 @@ function PutMensajeById(IdMensaje, TextMensaje) {
         data: JSON.stringify(messagge)
     });
 }
+//ELIMINAR INFORMACION DE UN MENSAJE POR SU ID
 function DeleteMensajeById(IdMensaje) {
     let messagge = {
         id: IdMensaje
@@ -280,13 +326,16 @@ function DeleteMensajeById(IdMensaje) {
         data: JSON.stringify(messagge)
     });
 }
-//METODO PARA SABER EL MODULO DONDE ESTA EL USUARIO
+/*********** METODO PARA SABER EL MODULO DONDE ESTA EL USUARIO ***********/
 function getEventTarget(e) {
     e = e || window.event;
     return e.target || e.srcElement;
 }
-//EVENTOS BOTONES
 var Modulo = "";
+var IdData = null;
+var DataRowApi = [];
+var Opcion;
+/************************** EVENTO PARA CARGAR TABLA DEL MODULO ***************************/
 document.getElementById('pills-tab').addEventListener("click", function (event) {
     Modulo = getEventTarget(event).innerText;
     if (Modulo == "Cabañas") {
@@ -299,12 +348,7 @@ document.getElementById('pills-tab').addEventListener("click", function (event) 
         TablaMensajes();
     }
 });
-var IdData = null;
-var DataRowApi = [];
-var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
-    keyboard: false
-})
-var Opcion;
+/************************** EVENTOS BOTONES ***************************/
 //EVENTO BOTON ACTUALIZAR
 const btnActualizar = document.getElementById("btnActualizar");
 btnActualizar.addEventListener("click", function (event) {
@@ -323,9 +367,9 @@ btnActualizar.addEventListener("click", function (event) {
                     let Content = $("<label class=\"form-label\" style=\"min-width: 100%;\">Nombre:</label>");
                     Content.append($("<input type=\"text\" class=\"form-control\" id=\"NomCabin\" placeholder=\"Nombre\" style=\"min-width: 100%;\" value=\"" + NombreCabin + "\" />"));
                     Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Habitaciones:</label>"));
-                    Content.append($("<input type=\"number\" class=\"form-control\" id=\"HabiCabin\" placeholder=\"Edad\" style=\"min-width: 100%;\" value=\"" + HabitacionesCabin + "\" />"));
+                    Content.append($("<input type=\"number\" class=\"form-control\" id=\"HabiCabin\" placeholder=\"Habitaciones\" style=\"min-width: 100%;\" value=\"" + HabitacionesCabin + "\" />"));
                     Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Id Categoria:</label>"));
-                    Content.append($("<input type=\"number\" class=\"form-control\" id=\"CateCabin\" placeholder=\"Edad\" style=\"min-width: 100%;\" value=\"" + IdCategoriaCabin + "\" />"));
+                    Content.append($("<input type=\"number\" class=\"form-control\" id=\"CateCabin\" placeholder=\"Id Categoria\" style=\"min-width: 100%;\" value=\"" + IdCategoriaCabin + "\" />"));
                     Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Comentarios:</label>"));
                     Content.append($("<textarea id=\"ComenCabin\" class=\"form-control\ style=\"min-width: 100%\" rows=\"5\">" + ComentariosCabin + "</textarea>"));
                     $('#content-popup').append(Content);
@@ -394,13 +438,13 @@ btnCrear.addEventListener("click", function (event) {
     if (Modulo == "Cabañas") {
         HeaderFooterPopup("Crear Cabaña", "Crear");
         let Content = $("<label class=\"form-label\" style=\"min-width: 100%;\">Nombre:</label>");
-        Content.append($("<input type=\"text\" class=\"form-control\" id=\"NomCabin\" placeholder=\"Nombre\" style=\"min-width: 100%;\" value=\"\" />"));
+        Content.append($("<input type=\"text\" class=\"form-control\" id=\"NomCabinCreate\" placeholder=\"Nombre\" style=\"min-width: 100%;\" value=\"\" />"));
         Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Habitaciones:</label>"));
-        Content.append($("<input type=\"number\" class=\"form-control\" id=\"HabiCabin\" placeholder=\"Edad\" style=\"min-width: 100%;\" value=\"\" />"));
+        Content.append($("<input type=\"number\" class=\"form-control\" id=\"HabiCabinCreate\" placeholder=\"Habitaciones\" style=\"min-width: 100%;\" value=\"\" />"));
         Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Id Categoria:</label>"));
-        Content.append($("<input type=\"number\" class=\"form-control\" id=\"CateCabin\" placeholder=\"Edad\" style=\"min-width: 100%;\" value=\"\" />"));
+        Content.append($("<input type=\"number\" class=\"form-control\" id=\"CateCabinCreate\" placeholder=\"Id Categoria\" style=\"min-width: 100%;\" value=\"\" />"));
         Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Comentarios:</label>"));
-        Content.append($("<textarea id=\"ComenCabin\" class=\"form-control\ style=\"min-width: 100%\" rows=\"5\"></textarea>"));
+        Content.append($("<textarea id=\"ComenCabinCreate\" class=\"form-control\ style=\"min-width: 100%\" rows=\"5\"></textarea>"));
         $('#content-popup').append(Content);
         myModal.show();
     } else if (Modulo == "Categoria") {
@@ -577,8 +621,28 @@ btnSalvar.addEventListener("click", function (event) {
             }
         }
     } else if (Opcion == 1) {
-        if (Modulo == "") {
-
+        if (Modulo == "Cabañas") {
+            $.when(GetCabanaEndId()).done(function (element) {
+                if (element.items.length > 0) {
+                    let GetIdEnd = element.items[0].id;
+                    let Id = GetIdEnd + 1;
+                    let NombreCabin = $('#NomCabinCreate').val();
+                    let HabitaCabin = $('#HabiCabinCreate').val();
+                    let Id_CatCabin = $('#CateCabinCreate').val();
+                    let ComentCabin = $('#ComenCabinCreate').val();
+                    $.when(PostCabana(Id, NombreCabin, HabitaCabin, Id_CatCabin, ComentCabin)).then(function (data, textStatus, jqXHR) {
+                        if (jqXHR.status == "200" || jqXHR.status == "204" || jqXHR.status == "201") {
+                            TablaCabanas();
+                            alert("Cabaña creada correctamente.");
+                            myModal.hide();
+                        } else {
+                            alert("No se pudo crear la cabaña. Error: " + textStatus);
+                        }
+                    });
+                } else {
+                    alert("No se puedo obtener el ultimo Id de la tabla cabañas.");
+                }
+            });
         } else if (Modulo == "Categoria") {
             $.when(GetCategoriaEndId()).done(function (element) {
                 if (element.items.length > 0) {
@@ -642,8 +706,8 @@ btnSalvar.addEventListener("click", function (event) {
         }
     }
 });
-//OBTENER INFORMACION DE LA LINEA SELECCIONADA
 var SelectedRow = null;
+/*********** OBTENER INFORMACION DE LA LINEA SELECCIONADA ***********/
 function GetDataRowSelected(param) {
     let Datos = null;
     let Id = null;
@@ -656,10 +720,16 @@ function GetDataRowSelected(param) {
         Datos = Id;
     return Datos;
 }
+/*********** OBTENER MODAL PARA ACTUALIZAR Y CREAR INFORMACION ***********/
+var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
+    keyboard: false
+})
+//CAMBIAR EL TITULO Y EL NOMBRE DE BOTONES DEL MODAL
 function HeaderFooterPopup(tittle, modebutton) {
     document.getElementsByClassName('modal-title')[0].innerHTML = tittle;
     document.getElementById('Salvar').innerHTML = modebutton;
 }
+//METODO QUE SE EJECUTA AL CARGAR LA PAGINA
 $(document).ready(function () {
     TablaCabanas();
     Modulo = "Cabañas";
