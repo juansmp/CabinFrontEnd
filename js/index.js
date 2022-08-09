@@ -1,3 +1,4 @@
+//URL para acceder a la BD
 const urlBase = "https://g651f78cf1701ef-bdalquilercabanas.adb.ca-toronto-1.oraclecloudapps.com/ords/admin/";
 $('#CabanasTable').on('click', 'tbody tr', function (event) {
     $(this).addClass('highlight').siblings().removeClass('highlight');
