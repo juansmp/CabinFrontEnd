@@ -39,7 +39,7 @@
   background-color: #ffc1077e;
 }
 .d-flex.justify-content-center > button {
-    width: 10%;
-    min-width: 95px;
-    margin: 0 5%;
+  width: 10%;
+  min-width: 95px;
+  margin: 0 5%;
 }
