@@ -43,13 +43,13 @@ function GetCabanaById(IdCabana) {
 
 
 //INSERTAR INFORMACION A LA TABLA CABANAS
-function PostCabana(Nombre, Habitaciones, Id_Categoria, Comentarios) {
+function PostCabana(Nombre, TipoCabin, Habitaciones, Id_Categoria, Descripcion) {
     let cabin = {
-        brand: Nombre,
+        name: Nombre,
+        brand: TipoCabin,
         rooms: Habitaciones,
-        category_id: { "id": Id_Categoria },
-        name: Comentarios,
-        description: Comentarios
+        category: { "id": Id_Categoria },
+        description: Descripcion
     }
     return $.ajax({
         url: urlBase + "Cabin/save",
@@ -59,13 +59,14 @@ function PostCabana(Nombre, Habitaciones, Id_Categoria, Comentarios) {
     });
 }
 //ACTUALIZAR INFORMACION DE UNA CABANA POR SU ID
-function PutCabanaById(IdCabana, Nombre, Habitaciones, Id_Categoria, Comentarios) {
+function PutCabanaById(IdCabana, Nombre, TipoCabin, Habitaciones, Id_Categoria, Descripcion) {
     let cabin = {
         id: IdCabana,
-        brand: Nombre,
+        name: Nombre,
+        brand: TipoCabin,
         rooms: Habitaciones,
-        category_id: Id_Categoria,
-        name: Comentarios
+        category: { "id": Id_Categoria },
+        description: Descripcion
     }
     return $.ajax({
         url: urlBase + "Cabin/update",
@@ -335,40 +336,36 @@ btnActualizar.addEventListener("click", function (event) {
         if (Modulo == "Cabañas") {
             HeaderFooterPopup("Actualizar Cabaña", "Actualizar");
             $.when(GetCabanaById(IdData)).done(function (element) {
-                if (element.items.length > 0) {
-                    let NombreCabin = element.items[0].brand;
-                    let HabitacionesCabin = element.items[0].rooms;
-                    let IdCategoriaCabin = element.items[0].category_id;
-                    let ComentariosCabin = element.items[0].name;
-                    let Content = $("<label class=\"form-label\" style=\"min-width: 100%;\">Nombre:</label>");
-                    Content.append($("<input type=\"text\" class=\"form-control\" id=\"NomCabin\" placeholder=\"Nombre\" style=\"min-width: 100%;\" value=\"" + NombreCabin + "\" />"));
-                    Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Habitaciones:</label>"));
-                    Content.append($("<input type=\"number\" class=\"form-control\" id=\"HabiCabin\" placeholder=\"Habitaciones\" style=\"min-width: 100%;\" value=\"" + HabitacionesCabin + "\" />"));
-                    Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Id Categoria:</label>"));
-                    Content.append($("<input type=\"number\" class=\"form-control\" id=\"CateCabin\" placeholder=\"Id Categoria\" style=\"min-width: 100%;\" value=\"" + IdCategoriaCabin + "\" />"));
-                    Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Comentarios:</label>"));
-                    Content.append($("<textarea id=\"ComenCabin\" class=\"form-control\ style=\"min-width: 100%\" rows=\"5\">" + ComentariosCabin + "</textarea>"));
-                    $('#content-popup').append(Content);
-                    myModal.show();
-                } else {
-                    alert("Error al consultar el categoria. Id: " + IdData);
-                }
+                let NombreCabin = element.name;
+                let TipoCabin = element.brand;
+                let HabitacionesCabin = element.rooms;
+                let IdCategoriaCabin = element.category.id;
+                let DescripcionCabin = element.description;
+                let Content = $("<label class=\"form-label\" style=\"min-width: 100%;\">Nombre:</label>");
+                Content.append($("<input type=\"text\" class=\"form-control\" id=\"NomCabin\" placeholder=\"Nombre\" style=\"min-width: 100%;\" value=\"" + NombreCabin + "\" />"));
+                Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Nro. Tipo de cabaña:</label>"));
+                Content.append($("<input type=\"text\" class=\"form-control\" id=\"TipoCabin\" placeholder=\"Tipo\" style=\"min-width: 100%;\" value=\"" + TipoCabin + "\" />"));
+                Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Nro. Habitaciones:</label>"));
+                Content.append($("<input type=\"number\" class=\"form-control\" id=\"HabiCabin\" placeholder=\"Habitaciones\" style=\"min-width: 100%;\" value=\"" + HabitacionesCabin + "\" />"));
+                Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Id Categoria:</label>"));
+                Content.append($("<input type=\"number\" class=\"form-control\" id=\"CateCabin\" placeholder=\"Id Categoria\" style=\"min-width: 100%;\" value=\"" + IdCategoriaCabin + "\" />"));
+                Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Descripción:</label>"));
+                Content.append($("<textarea id=\"DescCabin\" class=\"form-control\ style=\"min-width: 100%\" rows=\"5\">" + DescripcionCabin + "</textarea>"));
+                $('#content-popup').append(Content);
+                myModal.show();
             });
         } else if (Modulo == "Categoria") {
             HeaderFooterPopup("Actualizar Categoria", "Actualizar");
             $.when(GetCategoriaById(IdData)).done(function (element) {
-                if (element.items.length > 0) {
-                    let Nombre = element.items[0].name;
-                    let Descripcion = element.items[0].description;
-                    let Content = $("<label class=\"form-label\" style=\"min-width: 100%;\">Nombre:</label>");
-                    Content.append($("<input type=\"text\" class=\"form-control\" id=\"NomCategory\" placeholder=\"Nombre\" style=\"min-width: 100%;\" value=\"" + Nombre + "\" />"));
-                    Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Descripción:</label>"));
-                    Content.append($("<textarea id=\"DescripCategory\" class=\"form-control\ style=\"min-width: 100%\" rows=\"5\">" + Descripcion + "</textarea>"));
-                    $('#content-popup').append(Content);
-                    myModal.show();
-                } else {
-                    alert("Error al consultar el categoria. Id: " + IdData);
-                }
+                let Nombre = element.name;
+                let Descripcion = element.description;
+                let Content = $("<label class=\"form-label\" style=\"min-width: 100%;\">Nombre:</label>");
+                Content.append($("<input type=\"text\" class=\"form-control\" id=\"NomCategory\" placeholder=\"Nombre\" style=\"min-width: 100%;\" value=\"" + Nombre + "\" />"));
+                Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Descripción:</label>"));
+                Content.append($("<textarea id=\"DescripCategory\" class=\"form-control\ style=\"min-width: 100%\" rows=\"5\">" + Descripcion + "</textarea>"));
+                $('#content-popup').append(Content);
+                myModal.show();
+
             });
         } else if (Modulo == "Clientes") {
             HeaderFooterPopup("Actualizar Cliente", "Actualizar");
@@ -415,12 +412,14 @@ btnCrear.addEventListener("click", function (event) {
         HeaderFooterPopup("Crear Cabaña", "Crear");
         let Content = $("<label class=\"form-label\" style=\"min-width: 100%;\">Nombre:</label>");
         Content.append($("<input type=\"text\" class=\"form-control\" id=\"NomCabinCreate\" placeholder=\"Nombre\" style=\"min-width: 100%;\" value=\"\" />"));
+        Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Nro. Tipo de cabaña:</label>"));
+        Content.append($("<input type=\"text\" class=\"form-control\" id=\"TipoCabinCreate\" placeholder=\"Tipo\" style=\"min-width: 100%;\" value=\"\" />"));
         Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Habitaciones:</label>"));
         Content.append($("<input type=\"number\" class=\"form-control\" id=\"HabiCabinCreate\" placeholder=\"Habitaciones\" style=\"min-width: 100%;\" value=\"\" />"));
         Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Id Categoria:</label>"));
         Content.append($("<input type=\"number\" class=\"form-control\" id=\"CateCabinCreate\" placeholder=\"Id Categoria\" style=\"min-width: 100%;\" value=\"\" />"));
-        Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Comentarios:</label>"));
-        Content.append($("<textarea id=\"ComenCabinCreate\" class=\"form-control\ style=\"min-width: 100%\" rows=\"5\"></textarea>"));
+        Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Descripción:</label>"));
+        Content.append($("<textarea id=\"DescCabinCreate\" class=\"form-control\ style=\"min-width: 100%\" rows=\"5\"></textarea>"));
         $('#content-popup').append(Content);
         myModal.show();
     } else if (Modulo == "Categoria") {
@@ -539,10 +538,11 @@ btnSalvar.addEventListener("click", function (event) {
             if (Modulo == "Cabañas") {
                 if (confirm("¿Esta seguro que desea actualizar la cabaña?")) {
                     let NombreCabin = $('#NomCabin').val();
+                    let TipoCabin = $('#TipoCabin').val();
                     let HabitaCabin = $('#HabiCabin').val();
                     let Id_CatCabin = $('#CateCabin').val();
-                    let ComentCabin = $('#ComenCabin').val();
-                    $.when(PutCabanaById(IdData, NombreCabin, HabitaCabin, Id_CatCabin, ComentCabin)).then(function (data, textStatus, jqXHR) {
+                    let DescCabin = $('#DescCabin').val();
+                    $.when(PutCabanaById(IdData, NombreCabin, TipoCabin, HabitaCabin, Id_CatCabin, DescCabin)).then(function (data, textStatus, jqXHR) {
                         if (jqXHR.status == "200" || jqXHR.status == "204" || jqXHR.status == "201") {
                             TablaCabanas();
                             alert("Cabaña actualizada correctamente.");
@@ -599,10 +599,11 @@ btnSalvar.addEventListener("click", function (event) {
     } else if (Opcion == 1) {
         if (Modulo == "Cabañas") {
             let NombreCabin = $('#NomCabinCreate').val();
+            let TipoCabin = $('#TipoCabinCreate').val();
             let HabitaCabin = $('#HabiCabinCreate').val();
             let Id_CatCabin = $('#CateCabinCreate').val();
-            let ComentCabin = $('#ComenCabinCreate').val();
-            $.when(PostCabana(NombreCabin, HabitaCabin, Id_CatCabin, ComentCabin)).then(function (data, textStatus, jqXHR) {
+            let DescCabin = $('#DescCabinCreate').val();
+            $.when(PostCabana(NombreCabin, TipoCabin, HabitaCabin, Id_CatCabin, DescCabin)).then(function (data, textStatus, jqXHR) {
                 if (jqXHR.status == "200" || jqXHR.status == "204" || jqXHR.status == "201") {
                     TablaCabanas();
                     alert("Cabaña creada correctamente.");
