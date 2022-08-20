@@ -1,5 +1,10 @@
 /* URL PARA CONECTAR A LA BD*/
-const urlBase = "https://g651f78cf1701ef-bdalquilercabanas.adb.ca-toronto-1.oraclecloudapps.com/ords/admin/";
+// const urlBase = "https://g651f78cf1701ef-bdalquilercabanas.adb.ca-toronto-1.oraclecloudapps.com/ords/admin/";
+const urlBase = "http://localhost/api/";
+//const urlBase = "http://132.145.108.18:8082/api/";
+
+
+
 $('#CabanasTable').on('click', 'tbody tr', function (event) {
     $(this).addClass('highlight').siblings().removeClass('highlight');
 });
@@ -7,18 +12,19 @@ $('#CabanasTable').on('click', 'tbody tr', function (event) {
 //TRAER INFORMACION CABANAS
 function TablaCabanas() {
     $.ajax({
-        url: urlBase + "cabin/cabin",
+        url: urlBase + "Cabin/all",
         method: "GET",
         dataType: "json",
         success: function (response) {
             $("#tablaCabana").empty();
-            response.items.forEach(element => {
+            response.forEach(element => {
                 let row = $("<tr class=\"clickableRow\">");
                 row.append($("<td class=\"id\">").text(element.id));
-                row.append($("<td class=\"brand\">").text(element.brand));
-                row.append($("<td class=\"rooms\">").text(element.rooms));
-                row.append($("<td class=\"category_id\">").text(element.category_id));
-                row.append($("<td class=\"name\">").text(element.name));
+                row.append($("<td>").text(element.name));
+                row.append($("<td>").text(element.brand));
+                row.append($("<td>").text(element.rooms));
+                row.append($("<td>").text(element.description));
+                row.append($("<td>").text(element.category?.id));
                 $("#tablaCabana").append(row);
             });
         }, error: function (error) {
@@ -29,30 +35,24 @@ function TablaCabanas() {
 //TRAER INFORMACION DE UNA CABANA POR SU ID
 function GetCabanaById(IdCabana) {
     return $.ajax({
-        url: urlBase + "cabin/cabin/" + IdCabana,
+        url: urlBase + "Cabin/" + IdCabana,
         method: "GET",
         dataType: "json"
     });
 }
-//TRAER EL ULTIMO REGISTO DE LA TABLA CABANAS
-function GetCabanaEndId() {
-    return $.ajax({
-        url: urlBase + "cabin/count/1",
-        method: "GET",
-        dataType: "json"
-    });
-}
+
+
 //INSERTAR INFORMACION A LA TABLA CABANAS
-function PostCabana(IdCabana, Nombre, Habitaciones, Id_Categoria, Comentarios) {
+function PostCabana(Nombre, Habitaciones, Id_Categoria, Comentarios) {
     let cabin = {
-        id: IdCabana,
         brand: Nombre,
         rooms: Habitaciones,
-        category_id: Id_Categoria,
-        name: Comentarios
+        category_id: { "id": Id_Categoria },
+        name: Comentarios,
+        description: Comentarios
     }
     return $.ajax({
-        url: urlBase + "cabin/cabin",
+        url: urlBase + "Cabin/save",
         method: "POST",
         contentType: 'application/json',
         data: JSON.stringify(cabin)
@@ -68,7 +68,7 @@ function PutCabanaById(IdCabana, Nombre, Habitaciones, Id_Categoria, Comentarios
         name: Comentarios
     }
     return $.ajax({
-        url: urlBase + "cabin/cabin",
+        url: urlBase + "Cabin/update",
         method: "PUT",
         contentType: 'application/json',
         data: JSON.stringify(cabin)
@@ -80,7 +80,7 @@ function DeleteCabanaById(IdCabana) {
         id: IdCabana
     }
     return $.ajax({
-        url: urlBase + "cabin/cabin",
+        url: urlBase + "Cabin/delete",
         method: "DELETE",
         contentType: 'application/json',
         data: JSON.stringify(cabin)
@@ -93,12 +93,12 @@ $('#CategoriaTable').on('click', 'tbody tr', function (event) {
 //TRAER INFORMACION CATEGORIA
 function TablaCategoria() {
     $.ajax({
-        url: urlBase + "category/category",
+        url: urlBase + "Category/all",
         method: "GET",
         dataType: "json",
         success: function (response) {
             $("#tablaCategoria").empty();
-            response.items.forEach(element => {
+            response.forEach(element => {
                 let row = $("<tr class=\"clickableRow\">");
                 row.append($("<td class=\"id\">").text(element.id));
                 row.append($("<td>").text(element.name));
@@ -113,28 +113,20 @@ function TablaCategoria() {
 //TRAER INFORMACION DE UNA CATEGORIA POR SU ID
 function GetCategoriaById(IdCategoria) {
     return $.ajax({
-        url: urlBase + "category/category/" + IdCategoria,
+        url: urlBase + "Category/" + IdCategoria,
         method: "GET",
         dataType: "json"
     });
 }
-//TRAER EL ULTIMO REGISTRO DE LA TABLA CATEGORIA
-function GetCategoriaEndId() {
-    return $.ajax({
-        url: urlBase + "category/count/1",
-        method: "GET",
-        dataType: "json"
-    });
-}
+
 //INSERTAR INFORMACION A LA TABLA CATEGORIA
-function PostCategoria(IdCategoria, Nombre, Descripcion) {
+function PostCategoria(Nombre, Descripcion) {
     let category = {
-        id: IdCategoria,
         name: Nombre,
         description: Descripcion
     }
     return $.ajax({
-        url: urlBase + "category/category",
+        url: urlBase + "Category/save",
         method: "POST",
         contentType: 'application/json',
         data: JSON.stringify(category)
@@ -148,7 +140,7 @@ function PutCategoriaById(IdCategoria, Nombre, Descripcion) {
         description: Descripcion
     }
     return $.ajax({
-        url: urlBase + "category/category",
+        url: urlBase + "Category/update",
         method: "PUT",
         contentType: 'application/json',
         data: JSON.stringify(category)
@@ -160,7 +152,7 @@ function DeleteCategoriaById(IdCategoria) {
         id: IdCategoria
     }
     return $.ajax({
-        url: urlBase + "category/category",
+        url: urlBase + "Category/delete",
         method: "DELETE",
         contentType: 'application/json',
         data: JSON.stringify(category)
@@ -173,16 +165,16 @@ $('#ClientesTable').on('click', 'tbody tr', function (event) {
 //TRAER INFORMACION CLIENTES
 function TablaClientes() {
     $.ajax({
-        url: urlBase + "client/client",
+        url: urlBase + "Client/all",
         method: "GET",
         dataType: "json",
         success: function (response) {
             $("#tablaClientes").empty();
-            response.items.forEach(element => {
+            response.forEach(element => {
                 let row = $("<tr class=\"clickableRow\">");
-                row.append($("<td class=\"id\">").text(element.id));
-                row.append($("<td>").text(element.name));
+                row.append($("<td class=\"id\">").text(element.idClient));
                 row.append($("<td>").text(element.email));
+                row.append($("<td>").text(element.name));
                 row.append($("<td>").text(element.age));
                 $("#tablaClientes").append(row);
             });
@@ -194,29 +186,21 @@ function TablaClientes() {
 //TRAER INFORMACION DE UN CLIENTE POR SU ID
 function GetClienteById(IdCliente) {
     return $.ajax({
-        url: urlBase + "client/client/" + IdCliente,
+        url: urlBase + "Client/" + IdCliente,
         method: "GET",
         dataType: "json"
     });
 }
-//TRAER EL ULTIMO REGISTRO DE LA TABLA CLIENTE
-function GetClienteEndId() {
-    return $.ajax({
-        url: urlBase + "client/count/1",
-        method: "GET",
-        dataType: "json"
-    });
-}
+
 //INSERTAR INFORMACION A LA TABLA CLIENTE
-function PostCliente(IdCliente, Nombre, Email, Edad) {
+function PostCliente(Nombre, Email, Edad) {
     let client = {
-        id: IdCliente,
         name: Nombre,
         email: Email,
         age: Edad
     }
     return $.ajax({
-        url: urlBase + "client/client",
+        url: urlBase + "Client/save",
         method: "POST",
         contentType: 'application/json',
         data: JSON.stringify(client)
@@ -231,7 +215,7 @@ function PutClienteById(IdCliente, Nombre, Email, Edad) {
         age: Edad
     }
     return $.ajax({
-        url: urlBase + "client/client",
+        url: urlBase + "Client/update",
         method: "PUT",
         contentType: 'application/json',
         data: JSON.stringify(client)
@@ -240,10 +224,10 @@ function PutClienteById(IdCliente, Nombre, Email, Edad) {
 //ELIMINAR INFORMACION DE UN CLIENTE POR SU ID
 function DeleteClienteById(IdCliente) {
     let client = {
-        id: IdCliente
+        idClient: IdCliente
     }
     return $.ajax({
-        url: urlBase + "client/client",
+        url: urlBase + "Client/delete",
         method: "DELETE",
         contentType: 'application/json',
         data: JSON.stringify(client)
@@ -256,15 +240,15 @@ $('#MensajesTable').on('click', 'tbody tr', function (event) {
 //TRAER INFORMACION MENSAJES
 function TablaMensajes() {
     $.ajax({
-        url: urlBase + "message/message",
+        url: urlBase + "Message/all",
         method: "GET",
         dataType: "json",
         success: function (response) {
             $("#tablaMensajes").empty();
-            response.items.forEach(element => {
+            response.forEach(element => {
                 let row = $("<tr class=\"clickableRow\">");
-                row.append($("<td class=\"id\">").text(element.id));
-                row.append($("<td>").text(element.messagetext));
+                row.append($("<td class=\"id\">").text(element.idMessage));
+                row.append($("<td>").text(element.messageText));
                 $("#tablaMensajes").append(row);
             });
         }, error: function (error) {
@@ -275,27 +259,19 @@ function TablaMensajes() {
 //TRAER INFORMACION DE UN MENSAJE POR SU ID
 function GetMensajeById(IdMensaje) {
     return $.ajax({
-        url: urlBase + "message/message/" + IdMensaje,
+        url: urlBase + "Message/" + IdMensaje,
         method: "GET",
         dataType: "json"
     });
 }
-//TRAER EL ULTIMO REGISTRO DE LA TABLA MENSAJES
-function GetMensajeEndId() {
-    return $.ajax({
-        url: urlBase + "message/count/1",
-        method: "GET",
-        dataType: "json"
-    });
-}
+
 //INSERTAR INFORMACION A LA TABLA MENSAJES
-function PostMensaje(IdMen, MensaText) {
+function PostMensaje(MensaText) {
     let messagge = {
-        id: IdMen,
-        messagetext: MensaText
+        messageText: MensaText
     }
     return $.ajax({
-        url: urlBase + "message/message",
+        url: urlBase + "Message/save",
         method: "POST",
         contentType: 'application/json',
         data: JSON.stringify(messagge)
@@ -305,10 +281,10 @@ function PostMensaje(IdMen, MensaText) {
 function PutMensajeById(IdMensaje, TextMensaje) {
     let messagge = {
         id: IdMensaje,
-        messagetext: TextMensaje
+        messageText: TextMensaje
     }
     return $.ajax({
-        url: urlBase + "message/message",
+        url: urlBase + "Message/update",
         method: "PUT",
         contentType: 'application/json',
         data: JSON.stringify(messagge)
@@ -317,10 +293,10 @@ function PutMensajeById(IdMensaje, TextMensaje) {
 //ELIMINAR INFORMACION DE UN MENSAJE POR SU ID
 function DeleteMensajeById(IdMensaje) {
     let messagge = {
-        id: IdMensaje
+        idMessage: IdMensaje
     }
     return $.ajax({
-        url: urlBase + "message/message",
+        url: urlBase + "Message/delete",
         method: "DELETE",
         contentType: 'application/json',
         data: JSON.stringify(messagge)
@@ -417,7 +393,7 @@ btnActualizar.addEventListener("click", function (event) {
             HeaderFooterPopup("Actualizar Mensaje", "Actualizar");
             $.when(GetMensajeById(IdData)).done(function (element) {
                 if (element.items.length > 0) {
-                    let MensajeText = element.items[0].messagetext;
+                    let MensajeText = element.items[0].messageText;
                     let Content = $("<label for=\"exampleFormControlTextarea1\" class=\"form-label\">Mensaje:</label><textarea id=\"ValMensaje\" class=\"form-control\ style=\"min-width: 100%\" rows=\"5\">" + MensajeText + "</textarea>");
                     $('#content-popup').append(Content);
                     myModal.show();
@@ -479,8 +455,8 @@ btnEliminar.addEventListener("click", function (event) {
     if (IdData != null) {
         if (Modulo == "Cabañas") {
             $.when(GetCabanaById(IdData)).done(function (element) {
-                if (element.items.length > 0) {
-                    let NombreCabana = element.items[0].brand;
+                if (Object.keys(element).length !== 0) {
+                    let NombreCabana = element.name;
                     if (confirm('¿Desea eliminar la cabaña ' + NombreCabana + '?')) {
                         $.when(DeleteCabanaById(IdData)).then(function (data, textStatus, jqXHR) {
                             if (jqXHR.status == "200" || jqXHR.status == "204") {
@@ -497,8 +473,8 @@ btnEliminar.addEventListener("click", function (event) {
             });
         } else if (Modulo == "Categoria") {
             $.when(GetCategoriaById(IdData)).done(function (element) {
-                if (element.items.length > 0) {
-                    let NombreCategoria = element.items[0].name;
+                if (Object.keys(element).length !== 0) {
+                    let NombreCategoria = element.name;
                     if (confirm('¿Desea eliminar la categoria ' + NombreCategoria + '?')) {
                         $.when(DeleteCategoriaById(IdData)).then(function (data, textStatus, jqXHR) {
                             if (jqXHR.status == "200" || jqXHR.status == "204") {
@@ -515,8 +491,8 @@ btnEliminar.addEventListener("click", function (event) {
             });
         } else if (Modulo == "Clientes") {
             $.when(GetClienteById(IdData)).done(function (element) {
-                if (element.items.length > 0) {
-                    let NombreCliente = element.items[0].name;
+                if (Object.keys(element).length !== 0) {
+                    let NombreCliente = element.name;
                     if (confirm('¿Desea eliminar el cliente ' + NombreCliente + '?')) {
                         $.when(DeleteClienteById(IdData)).then(function (data, textStatus, jqXHR) {
                             if (jqXHR.status == "200" || jqXHR.status == "204") {
@@ -533,8 +509,8 @@ btnEliminar.addEventListener("click", function (event) {
             });
         } else if (Modulo == "Mensajes") {
             $.when(GetMensajeById(IdData)).done(function (element) {
-                if (element.items.length > 0) {
-                    let MensajeText = element.items[0].messagetext;
+                if (Object.keys(element).length !== 0) {
+                    let MensajeText = element.messageText;
                     if (confirm('¿Desea eliminar el mensaje ' + MensajeText + '?')) {
                         $.when(DeleteMensajeById(IdData)).then(function (data, textStatus, jqXHR) {
                             if (jqXHR.status == "200" || jqXHR.status == "204") {
@@ -622,85 +598,56 @@ btnSalvar.addEventListener("click", function (event) {
         }
     } else if (Opcion == 1) {
         if (Modulo == "Cabañas") {
-            $.when(GetCabanaEndId()).done(function (element) {
-                if (element.items.length > 0) {
-                    let GetIdEnd = element.items[0].id;
-                    let Id = GetIdEnd + 1;
-                    let NombreCabin = $('#NomCabinCreate').val();
-                    let HabitaCabin = $('#HabiCabinCreate').val();
-                    let Id_CatCabin = $('#CateCabinCreate').val();
-                    let ComentCabin = $('#ComenCabinCreate').val();
-                    $.when(PostCabana(Id, NombreCabin, HabitaCabin, Id_CatCabin, ComentCabin)).then(function (data, textStatus, jqXHR) {
-                        if (jqXHR.status == "200" || jqXHR.status == "204" || jqXHR.status == "201") {
-                            TablaCabanas();
-                            alert("Cabaña creada correctamente.");
-                            myModal.hide();
-                        } else {
-                            alert("No se pudo crear la cabaña. Error: " + textStatus);
-                        }
-                    });
+            let NombreCabin = $('#NomCabinCreate').val();
+            let HabitaCabin = $('#HabiCabinCreate').val();
+            let Id_CatCabin = $('#CateCabinCreate').val();
+            let ComentCabin = $('#ComenCabinCreate').val();
+            $.when(PostCabana(NombreCabin, HabitaCabin, Id_CatCabin, ComentCabin)).then(function (data, textStatus, jqXHR) {
+                if (jqXHR.status == "200" || jqXHR.status == "204" || jqXHR.status == "201") {
+                    TablaCabanas();
+                    alert("Cabaña creada correctamente.");
+                    myModal.hide();
                 } else {
-                    alert("No se puedo obtener el ultimo Id de la tabla cabañas.");
+                    alert("No se pudo crear la cabaña. Error: " + textStatus);
                 }
             });
+
         } else if (Modulo == "Categoria") {
-            $.when(GetCategoriaEndId()).done(function (element) {
-                if (element.items.length > 0) {
-                    let GetIdEnd = element.items[0].id;
-                    let Id = GetIdEnd + 1;
-                    let NombreCat = $('#NomCategoryCreate').val();
-                    let DescripCat = $('#DescripCategoryCreate').val();
-                    $.when(PostCategoria(Id, NombreCat, DescripCat)).then(function (data, textStatus, jqXHR) {
-                        if (jqXHR.status == "200" || jqXHR.status == "204" || jqXHR.status == "201") {
-                            TablaCategoria();
-                            alert("Categoria creada correctamente.");
-                            myModal.hide();
-                        } else {
-                            alert("No se pudo crear la categoria. Error: " + textStatus);
-                        }
-                    });
+            let NombreCat = $('#NomCategoryCreate').val();
+            let DescripCat = $('#DescripCategoryCreate').val();
+            $.when(PostCategoria(NombreCat, DescripCat)).then(function (data, textStatus, jqXHR) {
+                if (jqXHR.status == "200" || jqXHR.status == "204" || jqXHR.status == "201") {
+                    TablaCategoria();
+                    alert("Categoria creada correctamente.");
+                    myModal.hide();
                 } else {
-                    alert("No se puedo obtener el ultimo Id de la tabla categoria.");
+                    alert("No se pudo crear la categoria. Error: " + textStatus);
                 }
             });
+
         } else if (Modulo == "Clientes") {
-            $.when(GetClienteEndId()).done(function (element) {
-                if (element.items.length > 0) {
-                    let GetIdEnd = element.items[0].id;
-                    let Id = GetIdEnd + 1;
-                    let NombreCli = $('#NomCliCreate').val();
-                    let EmailCli = $('#EmailCliCreate').val();
-                    let EdadCli = $('#EdadCliCreate').val();
-                    $.when(PostCliente(Id, NombreCli, EmailCli, EdadCli)).then(function (data, textStatus, jqXHR) {
-                        if (jqXHR.status == "200" || jqXHR.status == "204" || jqXHR.status == "201") {
-                            TablaClientes();
-                            alert("Cliente creado correctamente.");
-                            myModal.hide();
-                        } else {
-                            alert("No se pudo crear el cliente. Error: " + textStatus);
-                        }
-                    });
+            let NombreCli = $('#NomCliCreate').val();
+            let EmailCli = $('#EmailCliCreate').val();
+            let EdadCli = $('#EdadCliCreate').val();
+            $.when(PostCliente(NombreCli, EmailCli, EdadCli)).then(function (data, textStatus, jqXHR) {
+                if (jqXHR.status == "200" || jqXHR.status == "204" || jqXHR.status == "201") {
+                    TablaClientes();
+                    alert("Cliente creado correctamente.");
+                    myModal.hide();
                 } else {
-                    alert("No se puedo obtener el ultimo Id de la tabla clientes.");
+                    alert("No se pudo crear el cliente. Error: " + textStatus);
                 }
             });
+
         } else if (Modulo == "Mensajes") {
-            $.when(GetMensajeEndId()).done(function (element) {
-                if (element.items.length > 0) {
-                    let GetIdEnd = element.items[0].id;
-                    let Id = GetIdEnd + 1;
-                    let MensajeMen = $('#CreateMensaje').val();
-                    $.when(PostMensaje(Id, MensajeMen)).then(function (data, textStatus, jqXHR) {
-                        if (jqXHR.status == "200" || jqXHR.status == "204" || jqXHR.status == "201") {
-                            TablaMensajes();
-                            alert("Mensaje creado correctamente.");
-                            myModal.hide();
-                        } else {
-                            alert("No se pudo crear el mensaje. Error: " + textStatus);
-                        }
-                    });
+            let MensajeMen = $('#CreateMensaje').val();
+            $.when(PostMensaje(MensajeMen)).then(function (data, textStatus, jqXHR) {
+                if (jqXHR.status == "200" || jqXHR.status == "204" || jqXHR.status == "201") {
+                    TablaMensajes();
+                    alert("Mensaje creado correctamente.");
+                    myModal.hide();
                 } else {
-                    alert("No se puedo obtener el ultimo Id de la tabla mensajes.");
+                    alert("No se pudo crear el mensaje. Error: " + textStatus);
                 }
             });
         }
