@@ -5,10 +5,11 @@ const urlBase = "http://localhost/api/";
 
 
 
+/************************** METODOS CABANAS ***************************/
 $('#CabanasTable').on('click', 'tbody tr', function (event) {
     $(this).addClass('highlight').siblings().removeClass('highlight');
 });
-/************************** METODOS CABANAS ***************************/
+
 //TRAER INFORMACION CABANAS
 function TablaCabanas() {
     $.ajax({
@@ -81,7 +82,7 @@ function DeleteCabanaById(IdCabana) {
         id: IdCabana
     }
     return $.ajax({
-        url: urlBase + "Cabin/delete",
+        url: urlBase + "Cabin/" + IdCabana,
         method: "DELETE",
         contentType: 'application/json',
         data: JSON.stringify(cabin)
@@ -153,7 +154,7 @@ function DeleteCategoriaById(IdCategoria) {
         id: IdCategoria
     }
     return $.ajax({
-        url: urlBase + "Category/delete",
+        url: urlBase + "Category/" + IdCategoria,
         method: "DELETE",
         contentType: 'application/json',
         data: JSON.stringify(category)
@@ -230,7 +231,7 @@ function DeleteClienteById(IdCliente) {
         idClient: IdCliente
     }
     return $.ajax({
-        url: urlBase + "Client/delete",
+        url: urlBase + "Client/" + IdCliente,
         method: "DELETE",
         contentType: 'application/json',
         data: JSON.stringify(client)
@@ -301,12 +302,95 @@ function DeleteMensajeById(IdMensaje) {
         idMessage: IdMensaje
     }
     return $.ajax({
-        url: urlBase + "Message/delete",
+        url: urlBase + "Message/" + IdMensaje,
         method: "DELETE",
         contentType: 'application/json',
         data: JSON.stringify(message)
     });
 }
+
+
+
+/************************** METODOS RESERVAS ***************************/
+$('#ReservasTable').on('click', 'tbody tr', function (event) {
+    $(this).addClass('highlight').siblings().removeClass('highlight');
+});
+
+//TRAER INFORMACION RESERVAS
+function TablaReservas() {
+    $.ajax({
+        url: urlBase + "Reservation/all",
+        method: "GET",
+        dataType: "json",
+        success: function (response) {
+            $("#tablaReservas").empty();
+            response.forEach(element => {
+                let row = $("<tr class=\"clickableRow\">");
+                row.append($("<td class=\"id\" style=\"display:none\">").text(element.idReservation));
+                row.append($("<td>").text(element.startDate));
+                row.append($("<td>").text(element.devolutionDate));
+                row.append($("<td style=\"display:none\">").text(element.cabin?.id));
+                $("#tablaReservas").append(row);
+            });
+        }, error: function (error) {
+            console.error(error);
+        }
+    });
+}
+//TRAER INFORMACION DE UNA RESERVA POR SU ID
+function GetReservaById(IdReserva) {
+    return $.ajax({
+        url: urlBase + "Reservation/" + IdReserva,
+        method: "GET",
+        dataType: "json"
+    });
+}
+
+
+//INSERTAR INFORMACION A LA TABLA RESERVAS
+function PostReserva(FechaInicio, FechaFin, Id_Cabana) {
+    let reservation = {
+        startDate: FechaInicio,
+        devolutionDate: FechaFin,
+        cabin: { "id": Id_Cabana }
+    }
+    return $.ajax({
+        url: urlBase + "Reservation/save",
+        method: "POST",
+        contentType: 'application/json',
+        data: JSON.stringify(reservation)
+    });
+}
+//ACTUALIZAR INFORMACION DE UNA RESERVA POR SU ID
+function PutReservaById(IdReserva, FechaInicio, FechaFin, Id_Cabana) {
+    let reservation = {
+        idReservation: IdReserva,
+        startDate: FechaInicio,
+        devolutionDate: FechaFin,
+        cabin: { "id": Id_Cabana }
+    }
+    return $.ajax({
+        url: urlBase + "Reservation/update",
+        method: "PUT",
+        contentType: 'application/json',
+        data: JSON.stringify(reservation)
+    });
+}
+//ELIMINAR INFORMACION DE UNA RESERVA POR SU ID
+function DeleteReservaById(IdReserva) {
+    let reservation = {
+        id: IdReserva
+    }
+    return $.ajax({
+        url: urlBase + "Reservation/" + IdReserva,
+        method: "DELETE",
+        contentType: 'application/json',
+        data: JSON.stringify(reservation)
+    });
+}
+
+
+
 /*********** METODO PARA SABER EL MODULO DONDE ESTA EL USUARIO ***********/
 function getEventTarget(e) {
     e = e || window.event;
@@ -327,6 +411,8 @@ document.getElementById('pills-tab').addEventListener("click", function (event) 
         TablaClientes();
     } else if (Modulo == "Mensajes") {
         TablaMensajes();
+    } else if (Modulo == "Reservas") {
+        TablaReservas();
     }
 });
 /************************** EVENTOS BOTONES ***************************/
@@ -347,7 +433,7 @@ btnActualizar.addEventListener("click", function (event) {
                 let DescripcionCabin = element.description;
                 let Content = $("<label class=\"form-label\" style=\"min-width: 100%;\">Nombre:</label>");
                 Content.append($("<input type=\"text\" class=\"form-control\" id=\"NomCabin\" placeholder=\"Nombre\" style=\"min-width: 100%;\" value=\"" + NombreCabin + "\" />"));
-                Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Nro. Tipo de cabaña:</label>"));
+                Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Tipo de cabaña:</label>"));
                 Content.append($("<input type=\"text\" class=\"form-control\" id=\"TipoCabin\" placeholder=\"Tipo\" style=\"min-width: 100%;\" value=\"" + TipoCabin + "\" />"));
                 Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Nro. Habitaciones:</label>"));
                 Content.append($("<input type=\"number\" class=\"form-control\" id=\"HabiCabin\" placeholder=\"Habitaciones\" style=\"min-width: 100%;\" value=\"" + HabitacionesCabin + "\" />"));
@@ -393,10 +479,25 @@ btnActualizar.addEventListener("click", function (event) {
             HeaderFooterPopup("Actualizar Mensaje", "Actualizar");
             $.when(GetMensajeById(IdData)).done(function (element) {
                 let MensajeText = element.messageText;
-                let IdCabinMessage = element.messageText;                
+                let IdCabinMessage = element.messageText;
                 let Content = ($("<label class=\"form-label\" style=\"min-width: 100%;\">Id Cabaña:</label>"));
                 Content.append($("<input type=\"number\" class=\"form-control\" id=\"CabinMessageUpdate\" placeholder=\"Id Cabaña\" style=\"min-width: 100%;\" value=\"" + IdCabinMessage + "\" />"));
                 Content.append($("<label for=\"exampleFormControlTextarea1\" class=\"form-label\">Mensaje:</label><textarea id=\"ValMensaje\" class=\"form-control\ style=\"min-width: 100%\" rows=\"5\">" + MensajeText + "</textarea>"));
+                $('#content-popup').append(Content);
+                myModal.show();
+            });
+        } else if (Modulo == "Reservas") {
+            HeaderFooterPopup("Actualizar Reserva", "Actualizar");
+            $.when(GetReservaById(IdData)).done(function (element) {
+                let FechaInicio = element.startDate;
+                let FechaFin = element.devolutionDate;
+                let IdReservaCabin = element.cabin.id;
+                let Content = $("<label class=\"form-label\" style=\"min-width: 100%;\">Fecha Inicio:</label>");
+                Content.append($("<input type=\"text\" class=\"form-control\" id=\"FechaInicioReservationUpdate\" placeholder=\"Fecha Inicio\" style=\"min-width: 100%;\" value=\"" + FechaInicio + "\" />"));
+                Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Fecha Fin:</label>"));
+                Content.append($("<input type=\"text\" class=\"form-control\" id=\"FechaFinReservationUpdate\" placeholder=\"Fecha Fin\" style=\"min-width: 100%;\" value=\"" + FechaFin + "\" />"));
+                Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Id Cabaña:</label>"));
+                Content.append($("<input type=\"number\" class=\"form-control\" id=\"CabinReservationUpdate\" placeholder=\"Id Cabaña\" style=\"min-width: 100%;\" value=\"" + IdReservaCabin + "\" />"));
                 $('#content-popup').append(Content);
                 myModal.show();
             });
@@ -449,6 +550,16 @@ btnCrear.addEventListener("click", function (event) {
         let Content = ($("<label class=\"form-label\" style=\"min-width: 100%;\">Id Cabaña:</label>"));
         Content.append($("<input type=\"number\" class=\"form-control\" id=\"CabinMessageCreate\" placeholder=\"Id Categoria\" style=\"min-width: 100%;\" value=\"\" />"));
         Content.append($("<label for=\"exampleFormControlTextarea1\" class=\"form-label\">Mensaje:</label><textarea id=\"CreateMensaje\" class=\"form-control\ style=\"min-width: 100%\" rows=\"5\"></textarea>"));
+        $('#content-popup').append(Content);
+        myModal.show();
+    } else if (Modulo == "Reservas") {
+        HeaderFooterPopup("Crear Reserva", "Crear");
+        let Content = $("<label class=\"form-label\" style=\"min-width: 100%;\">Fecha Inicio:</label>");
+        Content.append($("<input type=\"text\" class=\"form-control\" id=\"FechaInicioReservationCreate\" placeholder=\"Fecha Inicio\" style=\"min-width: 100%;\" value=\"\" />"));
+        Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Fecha Fin:</label>"));
+        Content.append($("<input type=\"text\" class=\"form-control\" id=\"FechaFinReservationCreate\" placeholder=\"Fecha Fin\" style=\"min-width: 100%;\" value=\"\" />"));
+        Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Id Cabaña:</label>"));
+        Content.append($("<input type=\"number\" class=\"form-control\" id=\"CabinReservationCreate\" placeholder=\"Id Cabaña\" style=\"min-width: 100%;\" value=\"\" />"));
         $('#content-popup').append(Content);
         myModal.show();
     }
@@ -530,6 +641,25 @@ btnEliminar.addEventListener("click", function (event) {
                     alert("Error al consultar el mensaje. Id: " + IdData);
                 }
             });
+        } else if (Modulo == "Reservas") {
+            $.when(GetReservaById(IdData)).done(function (element) {
+                if (Object.keys(element).length !== 0) {
+                    let FechaInicio = element.startDate;
+                    let FechaFin = element.devolutionDate;
+                    if (confirm('¿Desea eliminar la reserva que va entre: ' + FechaInicio + ' y ' + FechaFin + '?')) {
+                        $.when(DeleteReservaById(IdData)).then(function (data, textStatus, jqXHR) {
+                            if (jqXHR.status == "200" || jqXHR.status == "204") {
+                                TablaReservas();
+                                alert("La reserva fue eliminada correctamente.");
+                            } else {
+                                alert("No se pudo eliminar la reseva. Error: " + textStatus);
+                            }
+                        });
+                    }
+                } else {
+                    alert("Error al consultar la reserva. Id: " + IdData);
+                }
+            });
         }
     } else {
         alert("Debe seleccionar " + Modulo);
@@ -602,7 +732,23 @@ btnSalvar.addEventListener("click", function (event) {
                         }
                     });
                 }
+            } else if (Modulo == "Reservas") {
+                if (confirm("¿Esta seguro que desea actualizar la reserva?")) {
+                    let FechaInicio = $('#FechaInicioReservationUpdate').val();
+                    let FechaFin = $('#FechaFinReservationUpdate').val();
+                    let Id_Cabin = $('#CabinReservationUpdate').val();
+                    $.when(PutReservaById(IdData, FechaInicio, FechaFin, Id_Cabin)).then(function (data, textStatus, jqXHR) {
+                        if (jqXHR.status == "200" || jqXHR.status == "204" || jqXHR.status == "201") {
+                            TablaReservas();
+                            alert("Reserva actualizada correctamente.");
+                            myModal.hide();
+                        } else {
+                            alert("No se pudo actualizar la reserva. Error: " + textStatus);
+                        }
+                    });
+                }
             }
+
         }
     } else if (Opcion == 1) {
         if (Modulo == "Cabañas") {
@@ -661,6 +807,19 @@ btnSalvar.addEventListener("click", function (event) {
                     alert("No se pudo crear el mensaje. Error: " + textStatus);
                 }
             });
+        } else if (Modulo == "Reservas") {
+            let FechaInicio = $('#FechaInicioReservationCreate').val();
+            let FechaFin = $('#FechaFinReservationCreate').val();
+            let Id_Cabin = $('#CabinReservationCreate').val();
+            $.when(PostReserva(FechaInicio, FechaFin, Id_Cabin)).then(function (data, textStatus, jqXHR) {
+                if (jqXHR.status == "200" || jqXHR.status == "204" || jqXHR.status == "201") {
+                    TablaReservas();
+                    alert("Reserva creada correctamente.");
+                    myModal.hide();
+                } else {
+                    alert("No se pudo crear la reserva. Error: " + textStatus);
+                }
+            });
         }
     }
 });
@@ -669,7 +828,8 @@ var SelectedRow = null;
 function GetDataRowSelected(param) {
     let Datos = null;
     let Id = null;
-    let TableSelected = (param == "Cabañas") ? '#tablaCabana' : (param == "Categoria") ? "#tablaCategoria" : (param == "Clientes") ? '#tablaClientes' : (param == "Mensajes") ? '#tablaMensajes' : '';
+    let TableSelected = (param == "Cabañas") ? '#tablaCabana' : (param == "Categoria") ? "#tablaCategoria" : (param == "Clientes") ?
+        '#tablaClientes' : (param == "Mensajes") ? '#tablaMensajes' : (param == "Reservas") ? '#tablaReservas' : '';
     TableSelected += ' .highlight';
     $(TableSelected).each(function () {
         Id = $(this).find(".id").html();
