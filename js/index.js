@@ -19,12 +19,12 @@ function TablaCabanas() {
             $("#tablaCabana").empty();
             response.forEach(element => {
                 let row = $("<tr class=\"clickableRow\">");
-                row.append($("<td class=\"id\">").text(element.id));
+                row.append($("<td class=\"id\" style=\"display:none\">").text(element.id));
                 row.append($("<td>").text(element.name));
                 row.append($("<td>").text(element.brand));
                 row.append($("<td>").text(element.rooms));
                 row.append($("<td>").text(element.description));
-                row.append($("<td>").text(element.category?.id));
+                row.append($("<td style=\"display:none\">").text(element.category?.id));
                 $("#tablaCabana").append(row);
             });
         }, error: function (error) {
@@ -101,7 +101,7 @@ function TablaCategoria() {
             $("#tablaCategoria").empty();
             response.forEach(element => {
                 let row = $("<tr class=\"clickableRow\">");
-                row.append($("<td class=\"id\">").text(element.id));
+                row.append($("<td class=\"id\" style=\"display:none\">").text(element.id));
                 row.append($("<td>").text(element.name));
                 row.append($("<td>").text(element.description));
                 $("#tablaCategoria").append(row);
@@ -173,7 +173,7 @@ function TablaClientes() {
             $("#tablaClientes").empty();
             response.forEach(element => {
                 let row = $("<tr class=\"clickableRow\">");
-                row.append($("<td class=\"id\">").text(element.idClient));
+                row.append($("<td class=\"id\" style=\"display:none\">").text(element.idClient));
                 row.append($("<td>").text(element.email));
                 row.append($("<td>").text(element.name));
                 row.append($("<td>").text(element.age));
@@ -194,10 +194,11 @@ function GetClienteById(IdCliente) {
 }
 
 //INSERTAR INFORMACION A LA TABLA CLIENTE
-function PostCliente(Nombre, Email, Edad) {
+function PostCliente(Nombre, Email, Edad, Password) {
     let client = {
         name: Nombre,
         email: Email,
+        password: Password,
         age: Edad
     }
     return $.ajax({
@@ -208,11 +209,12 @@ function PostCliente(Nombre, Email, Edad) {
     });
 }
 //ACTUALIZAR INFORMACION DE UN CLIENTE POR SU ID
-function PutClienteById(IdCliente, Nombre, Email, Edad) {
+function PutClienteById(IdCliente, Nombre, Email, Edad, Password) {
     let client = {
-        id: IdCliente,
+        idClient: IdCliente,
         name: Nombre,
         email: Email,
+        password: Password,
         age: Edad
     }
     return $.ajax({
@@ -248,7 +250,7 @@ function TablaMensajes() {
             $("#tablaMensajes").empty();
             response.forEach(element => {
                 let row = $("<tr class=\"clickableRow\">");
-                row.append($("<td class=\"id\">").text(element.idMessage));
+                row.append($("<td class=\"id\" style=\"display:none\">").text(element.idMessage));
                 row.append($("<td>").text(element.messageText));
                 $("#tablaMensajes").append(row);
             });
@@ -267,40 +269,42 @@ function GetMensajeById(IdMensaje) {
 }
 
 //INSERTAR INFORMACION A LA TABLA MENSAJES
-function PostMensaje(MensaText) {
-    let messagge = {
-        messageText: MensaText
+function PostMensaje(MensaText, Id_Cabin) {
+    let message = {
+        messageText: MensaText,
+        cabin: { "id": Id_Cabin }
     }
     return $.ajax({
         url: urlBase + "Message/save",
         method: "POST",
         contentType: 'application/json',
-        data: JSON.stringify(messagge)
+        data: JSON.stringify(message)
     });
 }
 //ACTUALIZAR INFORMACION DE UN MENSAJE POR SU ID
-function PutMensajeById(IdMensaje, TextMensaje) {
-    let messagge = {
-        id: IdMensaje,
-        messageText: TextMensaje
+function PutMensajeById(IdMensaje, TextMensaje, Id_Cabin) {
+    let message = {
+        idMessage: IdMensaje,
+        messageText: TextMensaje,
+        cabin: { "id": Id_Cabin }
     }
     return $.ajax({
         url: urlBase + "Message/update",
         method: "PUT",
         contentType: 'application/json',
-        data: JSON.stringify(messagge)
+        data: JSON.stringify(message)
     });
 }
 //ELIMINAR INFORMACION DE UN MENSAJE POR SU ID
 function DeleteMensajeById(IdMensaje) {
-    let messagge = {
+    let message = {
         idMessage: IdMensaje
     }
     return $.ajax({
         url: urlBase + "Message/delete",
         method: "DELETE",
         contentType: 'application/json',
-        data: JSON.stringify(messagge)
+        data: JSON.stringify(message)
     });
 }
 /*********** METODO PARA SABER EL MODULO DONDE ESTA EL USUARIO ***********/
@@ -370,33 +374,31 @@ btnActualizar.addEventListener("click", function (event) {
         } else if (Modulo == "Clientes") {
             HeaderFooterPopup("Actualizar Cliente", "Actualizar");
             $.when(GetClienteById(IdData)).done(function (element) {
-                if (element.items.length > 0) {
-                    let Nombre = element.items[0].name;
-                    let Email = element.items[0].email;
-                    let Edad = element.items[0].age;
-                    let Content = $("<label class=\"form-label\" style=\"min-width: 100%;\">Nombre:</label>");
-                    Content.append($("<input type=\"text\" class=\"form-control\" id=\"NomCli\" placeholder=\"Nombre\" style=\"min-width: 100%;\" value=\"" + Nombre + "\" />"));
-                    Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Email:</label>"));
-                    Content.append($("<input type=\"email\" class=\"form-control\" id=\"EmailCli\" placeholder=\"Email\" style=\"min-width: 100%;\" value=\"" + Email + "\" />"));
-                    Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Edad:</label>"));
-                    Content.append($("<input type=\"number\" class=\"form-control\" id=\"EdadCli\" placeholder=\"Edad\" style=\"min-width: 100%;\" value=\"" + Edad + "\" />"));
-                    $('#content-popup').append(Content);
-                    myModal.show();
-                } else {
-                    alert("Error al consultar el mensaje. Id: " + IdData);
-                }
+                let Nombre = element.name;
+                let Email = element.email;
+                let Edad = element.age;
+                let Password = element.password;
+                let Content = $("<label class=\"form-label\" style=\"min-width: 100%;\">Nombre:</label>");
+                Content.append($("<input type=\"text\" class=\"form-control\" id=\"NomCli\" placeholder=\"Nombre\" style=\"min-width: 100%;\" value=\"" + Nombre + "\" />"));
+                Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Email:</label>"));
+                Content.append($("<input type=\"email\" class=\"form-control\" id=\"EmailCli\" placeholder=\"Email\" style=\"min-width: 100%;\" value=\"" + Email + "\" />"));
+                Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Contraseña:</label>"));
+                Content.append($("<input type=\"password\" class=\"form-control\" id=\"PasswordCli\" placeholder=\"Password\" style=\"min-width: 100%;\" value=\"" + Password + "\" />"));
+                Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Edad:</label>"));
+                Content.append($("<input type=\"number\" class=\"form-control\" id=\"EdadCli\" placeholder=\"Edad\" style=\"min-width: 100%;\" value=\"" + Edad + "\" />"));
+                $('#content-popup').append(Content);
+                myModal.show();
             });
         } else if (Modulo == "Mensajes") {
             HeaderFooterPopup("Actualizar Mensaje", "Actualizar");
             $.when(GetMensajeById(IdData)).done(function (element) {
-                if (element.items.length > 0) {
-                    let MensajeText = element.items[0].messageText;
-                    let Content = $("<label for=\"exampleFormControlTextarea1\" class=\"form-label\">Mensaje:</label><textarea id=\"ValMensaje\" class=\"form-control\ style=\"min-width: 100%\" rows=\"5\">" + MensajeText + "</textarea>");
-                    $('#content-popup').append(Content);
-                    myModal.show();
-                } else {
-                    alert("Error al consultar el mensaje. Id: " + IdData);
-                }
+                let MensajeText = element.messageText;
+                let IdCabinMessage = element.messageText;                
+                let Content = ($("<label class=\"form-label\" style=\"min-width: 100%;\">Id Cabaña:</label>"));
+                Content.append($("<input type=\"number\" class=\"form-control\" id=\"CabinMessageUpdate\" placeholder=\"Id Cabaña\" style=\"min-width: 100%;\" value=\"" + IdCabinMessage + "\" />"));
+                Content.append($("<label for=\"exampleFormControlTextarea1\" class=\"form-label\">Mensaje:</label><textarea id=\"ValMensaje\" class=\"form-control\ style=\"min-width: 100%\" rows=\"5\">" + MensajeText + "</textarea>"));
+                $('#content-popup').append(Content);
+                myModal.show();
             });
         }
     } else {
@@ -436,13 +438,17 @@ btnCrear.addEventListener("click", function (event) {
         Content.append($("<input type=\"text\" class=\"form-control\" id=\"NomCliCreate\" placeholder=\"Nombre\" style=\"min-width: 100%;\" value=\"\" />"));
         Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Email:</label>"));
         Content.append($("<input type=\"email\" class=\"form-control\" id=\"EmailCliCreate\" placeholder=\"Email\" style=\"min-width: 100%;\" value=\"\" />"));
+        Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Contraseña:</label>"));
+        Content.append($("<input type=\"password\" class=\"form-control\" id=\"PasswordCliCreate\" placeholder=\"Password\" style=\"min-width: 100%;\" value=\"\" />"));
         Content.append($("<label class=\"form-label\" style=\"min-width: 100%;\">Edad:</label>"));
         Content.append($("<input type=\"number\" class=\"form-control\" id=\"EdadCliCreate\" placeholder=\"Edad\" style=\"min-width: 100%;\" value=\"\" />"));
         $('#content-popup').append(Content);
         myModal.show();
     } else if (Modulo == "Mensajes") {
         HeaderFooterPopup("Crear Mensaje", "Crear");
-        let Content = $("<label for=\"exampleFormControlTextarea1\" class=\"form-label\">Mensaje:</label><textarea id=\"CreateMensaje\" class=\"form-control\ style=\"min-width: 100%\" rows=\"5\"></textarea>");
+        let Content = ($("<label class=\"form-label\" style=\"min-width: 100%;\">Id Cabaña:</label>"));
+        Content.append($("<input type=\"number\" class=\"form-control\" id=\"CabinMessageCreate\" placeholder=\"Id Categoria\" style=\"min-width: 100%;\" value=\"\" />"));
+        Content.append($("<label for=\"exampleFormControlTextarea1\" class=\"form-label\">Mensaje:</label><textarea id=\"CreateMensaje\" class=\"form-control\ style=\"min-width: 100%\" rows=\"5\"></textarea>"));
         $('#content-popup').append(Content);
         myModal.show();
     }
@@ -571,7 +577,8 @@ btnSalvar.addEventListener("click", function (event) {
                     let NombreCli = $('#NomCli').val();
                     let EmailCli = $('#EmailCli').val();
                     let EdadCli = $('#EdadCli').val();
-                    $.when(PutClienteById(IdData, NombreCli, EmailCli, EdadCli)).then(function (data, textStatus, jqXHR) {
+                    let PasswordCli = $('#PasswordCli').val();
+                    $.when(PutClienteById(IdData, NombreCli, EmailCli, EdadCli, PasswordCli)).then(function (data, textStatus, jqXHR) {
                         if (jqXHR.status == "200" || jqXHR.status == "204" || jqXHR.status == "201") {
                             TablaClientes();
                             alert("Cliente actualizado correctamente.");
@@ -584,7 +591,8 @@ btnSalvar.addEventListener("click", function (event) {
             } else if (Modulo == "Mensajes") {
                 if (confirm("¿Esta seguro que desea actualizar el mensaje?")) {
                     let MensajeMen = $('#ValMensaje').val();
-                    $.when(PutMensajeById(IdData, MensajeMen)).then(function (data, textStatus, jqXHR) {
+                    let Id_Cabin = $('#CabinMessageUpdate').val();
+                    $.when(PutMensajeById(IdData, MensajeMen, Id_Cabin)).then(function (data, textStatus, jqXHR) {
                         if (jqXHR.status == "200" || jqXHR.status == "204" || jqXHR.status == "201") {
                             TablaMensajes();
                             alert("Mensaje actualizado correctamente.");
@@ -630,7 +638,8 @@ btnSalvar.addEventListener("click", function (event) {
             let NombreCli = $('#NomCliCreate').val();
             let EmailCli = $('#EmailCliCreate').val();
             let EdadCli = $('#EdadCliCreate').val();
-            $.when(PostCliente(NombreCli, EmailCli, EdadCli)).then(function (data, textStatus, jqXHR) {
+            let PassCli = $('#PasswordCliCreate').val();
+            $.when(PostCliente(NombreCli, EmailCli, EdadCli, PassCli)).then(function (data, textStatus, jqXHR) {
                 if (jqXHR.status == "200" || jqXHR.status == "204" || jqXHR.status == "201") {
                     TablaClientes();
                     alert("Cliente creado correctamente.");
@@ -642,7 +651,8 @@ btnSalvar.addEventListener("click", function (event) {
 
         } else if (Modulo == "Mensajes") {
             let MensajeMen = $('#CreateMensaje').val();
-            $.when(PostMensaje(MensajeMen)).then(function (data, textStatus, jqXHR) {
+            let Id_Cabin = $('#CabinMessageCreate').val();
+            $.when(PostMensaje(MensajeMen, Id_Cabin)).then(function (data, textStatus, jqXHR) {
                 if (jqXHR.status == "200" || jqXHR.status == "204" || jqXHR.status == "201") {
                     TablaMensajes();
                     alert("Mensaje creado correctamente.");
